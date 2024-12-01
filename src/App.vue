@@ -77,14 +77,11 @@
             <div class="output-area panel">
               <h2>- 结果 -</h2>
               <div class="output-container">
-                <svg
-                  width="640"
-                  height="1024"
-                  viewBox="0 0 640 1024"
-                  class="output-svg"
-                >
-                  <!-- SVG内容将在这里生成 -->
-                </svg>
+                <div v-if="isLoading" class="loading">生成中...</div>
+                <div v-else>
+                  <div v-html="outputSvg" ref="svgContainer"></div>
+                  <a-button v-if="outputSvg" type="primary" @click="downloadAsPng">下载为PNG</a-button>
+                </div>
               </div>
             </div>
           </main>
@@ -107,56 +104,127 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { ref, onMounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import '@arco-design/web-vue/dist/arco.css'
 import { weapons } from './data/weapons.js'
+import { assemblePrompt, callAPI } from './api/prompt'
 
 const DEFAULT_BASE_URL = 'https://api.link-ai.tech/v1'
-const currentWeapon = ref(0)
-const userInput = ref('')
-const showSettings = ref(false)
-const settings = ref({
-  baseUrl: DEFAULT_BASE_URL,
-  apiKey: ''
-})
 
-// 从localStorage加载设置
-onMounted(() => {
-  const savedSettings = localStorage.getItem('mindArsenalSettings')
-  if (savedSettings) {
-    const parsed = JSON.parse(savedSettings)
-    settings.value = {
-      baseUrl: parsed.baseUrl || DEFAULT_BASE_URL,
-      apiKey: parsed.apiKey || ''
+export default {
+  name: 'App',
+  setup() {
+    const userInput = ref('')
+    const currentWeapon = ref(0)
+    const isLoading = ref(false)
+    const outputSvg = ref('')
+    const showSettings = ref(false)
+    const settings = ref({
+      baseUrl: DEFAULT_BASE_URL,
+      apiKey: ''
+    })
+    const svgContainer = ref(null)
+
+    // 从localStorage加载设置
+    onMounted(() => {
+      const savedSettings = localStorage.getItem('mindArsenalSettings')
+      if (savedSettings) {
+        const parsed = JSON.parse(savedSettings)
+        settings.value = {
+          baseUrl: parsed.baseUrl || DEFAULT_BASE_URL,
+          apiKey: parsed.apiKey || ''
+        }
+      }
+    })
+
+    // 保存设置到localStorage
+    const saveSettings = () => {
+      localStorage.setItem('mindArsenalSettings', JSON.stringify(settings.value))
+      showSettings.value = false
+      Message.success('设置已保存')
+    }
+
+    const handleSubmit = async () => {
+      if (!userInput.value.trim()) return
+      
+      isLoading.value = true
+      try {
+        const messages = assemblePrompt(weapons[currentWeapon.value], userInput.value)
+        const replyText = await callAPI(messages, settings.value.baseUrl, settings.value.apiKey)
+        outputSvg.value = replyText // SVG 内容直接渲染
+      } catch (error) {
+        console.error('处理请求错误:', error)
+      } finally {
+        isLoading.value = false
+      }
+    }
+
+    const selectWeapon = (id) => {
+      currentWeapon.value = id
+      userInput.value = ''
+      outputSvg.value = ''
+    }
+
+    const downloadAsPng = () => {
+      const svg = svgContainer.value.querySelector('svg')
+      if (!svg) return
+
+      // 创建一个临时canvas
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      
+      // 设置canvas尺寸与svg相同
+      canvas.width = svg.width.baseVal.value
+      canvas.height = svg.height.baseVal.value
+
+      // 将svg转为blob url
+      const svgData = new XMLSerializer().serializeToString(svg)
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
+      const url = URL.createObjectURL(svgBlob)
+
+      // 创建图片对象
+      const img = new Image()
+      img.onload = () => {
+        // 在canvas上绘制图片
+        ctx.fillStyle = 'white'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.drawImage(img, 0, 0)
+        
+        // 将canvas转为png并下载
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = 'mind-arsenal.png'
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+        }, 'image/png')
+        
+        URL.revokeObjectURL(url)
+      }
+      img.src = url
+    }
+
+    return {
+      userInput,
+      currentWeapon,
+      weapons,
+      isLoading,
+      outputSvg,
+      handleSubmit,
+      selectWeapon,
+      showSettings,
+      settings,
+      saveSettings,
+      DEFAULT_BASE_URL,
+      svgContainer,
+      downloadAsPng
     }
   }
-})
-
-// 保存设置到localStorage
-const saveSettings = () => {
-  localStorage.setItem('mindArsenalSettings', JSON.stringify(settings.value))
-  showSettings.value = false
-  Message.success('设置已保存')
-}
-
-const handleSubmit = async () => {
-  if (!userInput.value.trim()) {
-    Message.warning('请输入内容')
-    return
-  }
-  // TODO: 调用API获取SVG
-  console.log('提交内容:', userInput.value)
-}
-
-const selectWeapon = (id) => {
-  currentWeapon.value = id
-  userInput.value = ''  // 清空输入框
-}
-
-const insertWeapon = (weapon) => {
-  userInput.value += weapon
 }
 </script>
 
