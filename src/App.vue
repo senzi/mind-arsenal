@@ -4,12 +4,14 @@
       <header class="header panel">
         <div class="header-content">
           <div class="motto">七器启智，破局致远</div>
-          <button class="settings-btn" @click="showSettings = true">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
-          </button>
+          <div class="header-actions">
+            <button class="settings-btn" @click="showSettings = true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -38,53 +40,56 @@
         </div>
       </div>
 
-      <div class="content-wrapper">
-        <!-- 左侧武器列表 -->
-        <aside class="weapons-list panel">
-          <h2>思维器阁</h2>
-          <div class="weapons-grid">
-            <div
-              v-for="weapon in weapons"
-              :key="weapon.id"
-              class="weapon-button"
-              :class="{ active: currentWeapon === weapon.id }"
-              @click="selectWeapon(weapon.id)"
-            >
-              <div class="weapon-name">{{ weapon.name }}</div>
-              <div class="weapon-desc">{{ weapon.desc }}</div>
-            </div>
-          </div>
-        </aside>
-        
-        <!-- 右侧内容区 -->
-        <main class="interaction-area">
-          <!-- 输入区 -->
-          <div class="input-area panel">
-            <h2>- 缘起 -</h2>
-            <textarea
-              v-model="userInput"
-              :placeholder="weapons[currentWeapon].placeholder"
-              @keyup.enter="handleSubmit"
-            ></textarea>
-            <button @click="handleSubmit">推演</button>
-          </div>
-          
-          <!-- 输出区 -->
-          <div class="output-area panel">
-            <h2>- 结果 -</h2>
-            <div class="output-container">
-              <svg
-                width="640"
-                height="1024"
-                viewBox="0 0 640 1024"
-                class="output-svg"
+      <router-view v-slot="{ Component }">
+        <component :is="Component" v-if="$route.path === '/converter'" />
+        <div v-else class="content-wrapper">
+          <!-- 左侧武器列表 -->
+          <aside class="weapons-list panel">
+            <h2>思维器阁</h2>
+            <div class="weapons-grid">
+              <div
+                v-for="weapon in weapons"
+                :key="weapon.id"
+                class="weapon-button"
+                :class="{ active: currentWeapon === weapon.id }"
+                @click="selectWeapon(weapon.id)"
               >
-                <!-- SVG内容将在这里生成 -->
-              </svg>
+                <div class="weapon-name">{{ weapon.name }}</div>
+                <div class="weapon-desc">{{ weapon.desc }}</div>
+              </div>
             </div>
-          </div>
-        </main>
-      </div>
+          </aside>
+          
+          <!-- 右侧内容区 -->
+          <main class="interaction-area">
+            <!-- 输入区 -->
+            <div class="input-area panel">
+              <h2>- 缘起 -</h2>
+              <textarea
+                v-model="userInput"
+                :placeholder="weapons[currentWeapon].placeholder"
+                @keyup.enter="handleSubmit"
+              ></textarea>
+              <button @click="handleSubmit">推演</button>
+            </div>
+            
+            <!-- 输出区 -->
+            <div class="output-area panel">
+              <h2>- 结果 -</h2>
+              <div class="output-container">
+                <svg
+                  width="640"
+                  height="1024"
+                  viewBox="0 0 640 1024"
+                  class="output-svg"
+                >
+                  <!-- SVG内容将在这里生成 -->
+                </svg>
+              </div>
+            </div>
+          </main>
+        </div>
+      </router-view>
     </div>
 
     <footer class="footer">
@@ -206,6 +211,26 @@ body {
   color: var(--primary-color);
   font-weight: bold;
   letter-spacing: 0.2rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.converter-link {
+  padding: 0.5rem 1rem;
+  color: var(--primary-color);
+  text-decoration: none;
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.converter-link:hover {
+  background-color: var(--primary-color);
+  color: white;
 }
 
 .content-wrapper {

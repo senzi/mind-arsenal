@@ -11,7 +11,8 @@
   "dependencies": {
     "@arco-design/web-vue": "^2.56.3",
     "@vueuse/core": "^12.0.0",
-    "vue": "^3.5.12"
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
